@@ -1,0 +1,9 @@
+#!/bin/sh
+
+test=test004
+
+echo -n "attempt to open non-existent web log file......"
+$1 random_jklfe67ql random_pmfwds > actual_results/$test
+
+# Compare with expected results
+cmp --silent expected_results/$test actual_results/$test

@@ -1,5 +1,8 @@
 #!/bin/sh
 program=../stage_weblog
+if [ ! -d actual_results ]; then
+	mkdir actual_results
+fi
 
 function run_test {
 	echo -n "$1......"
@@ -12,7 +15,7 @@ function run_test {
 	fi
 	}
 
-tests="test001 test002 test003"
+tests="test001 test002 test003 test004"
 
 for test in $tests
 do	
