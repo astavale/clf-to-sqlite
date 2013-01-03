@@ -1,0 +1,10 @@
+#!/bin/sh
+
+test=test001
+
+echo -n "run with no parameters......"
+$1 > actual_results/$test
+
+# Compare with expected results
+cmp --silent expected_results/$test actual_results/$test
+ 

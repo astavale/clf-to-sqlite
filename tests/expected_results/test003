@@ -1,0 +1,8 @@
+** Failed **
+Expected 2 parameters, but 3 supplied.
+
+stage_weblog extracts web server hits from a combined format log file
+and loads them to a staging SQLite database table.
+
+Usage: stage_weblog weblog_filename sqlite_database
+

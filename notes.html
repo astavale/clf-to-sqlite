@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+<style type="text/css">
+body { width: 55em;
+	margin: 0 auto;
+	font-family: arial, helvetica, sans-serif;
+	}
+h1,h2 { margin: 1em 0 0 0; }
+p,ul,ol { margin: 0 0 1em 0; }
+</style>
+<title>Extract Web Log Data and Load to Database with Genie</title>
+</head>
+<body>
+<h1>Extract Web Log Data and Load to Database with Genie</h1>
+<h2>Contents</h2>
+<ol>
+<li><a href="#intro">Introduction</a></li>
+<li>Stages of development:
+<ol>
+<li><a href="#getopts">Parse Command Line Arguments</a></li>
+<li><a href="#openfile">Open Log File</a></li>
+<li><a href="#opendb">Open Database</a></li>
+<li><a href="#parse_hits">Parse Each Hit</a></li>
+<li><a href="#insert_hits">Insert Each Hit into Database</a></li>
+<li><a href="#report">Increment Counter and Produce Report at End</a></li>
+</ol>
+</li>
+</ol>
+
+<h2 id="intro">Introduction</h2>
+<p>Two file names should be passed as parameters to the program. The first points to the web log to be processed. The second points to the SQLite database to store the web server hits in a staging table.</p>
+<p>A web server hit is stored using nine fields in the web log. This is the combined log format:</p>
+<ol>
+<li>IP address of client</li>
+<li>TCP ident (not used)</li>
+<li>User name from HTTP authentication</li>
+<li>Time of request</li>
+<li>HTTP request line, includes method, URI and HTTP version</li>
+<li>Server response code, e.g. 200 for OK</li>
+<li>Count of bytes sent in response body, can be zero which is indicated by "-"</li>
+<li>HTTP referrer</li>
+<li>User agent</li>
+</ol>
+
+<h2 id="getopts">Parse Command Line Arguments</h2>
+
+</body>

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+test=test002
+
+echo -n "run with one parameter......"
+$1 random_jklaf45 > actual_results/$test
+
+# Compare with expected results
+cmp --silent expected_results/$test actual_results/$test

@@ -1,0 +1,20 @@
+#!/bin/sh
+program=../stage_weblog
+
+function run_test {
+	echo -n "$1......"
+	./$1 $program
+	if [ $? != 0 ]; then
+		echo "failed"
+		exit 1
+	else
+		echo "passed"
+	fi
+	}
+
+tests="test001 test002 test003"
+
+for test in $tests
+do	
+	run_test $test
+done
