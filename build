@@ -1,0 +1,2 @@
+#!/bin/sh
+valac --pkg=sqlite3 stage_weblog.gs

@@ -1,9 +1,14 @@
+uses
+	Sqlite
 
 init
 	if !two_parameters(args)
 		return
 	logfile:FileStream
 	if !logfile_open( args[1], out logfile )
+		return
+	database:Database
+	if !database_open( args[2], out database )
 		return
 
 def two_parameters( args : array of string):bool
@@ -23,4 +28,13 @@ def logfile_open( filename : string, out filestream : FileStream ):bool
 	else
 		print "** Failed **"
 		print "Unable to open log file: %s\n", filename
+		return false
+
+def database_open( filename : string, out database : Database ):bool
+	if Database.open_v2( filename, out database, Sqlite.OPEN_READWRITE ) == Sqlite.OK
+		return true
+	else
+		print "** Failed **"
+		print "Unable to open SQLite database file: %s", filename 
+		print "Message from SQLite: \"%s\"\n", database.errmsg()
 		return false

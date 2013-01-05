@@ -1,0 +1,9 @@
+#!/bin/sh
+
+test=test005
+
+echo -n "attempt to open non-existent database file......"
+$1 source_data/sample_log_file random_3ifjls4n > actual_results/$test
+
+# Compare with expected results
+cmp --silent expected_results/$test actual_results/$test
