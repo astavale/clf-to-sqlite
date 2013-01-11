@@ -10,6 +10,8 @@ init
 	database:Database
 	if !database_open( args[2], out database )
 		return
+	if !table_create( database )
+		return
 
 def two_parameters( args : array of string):bool
 	if args.length == 3
@@ -36,5 +38,26 @@ def database_open( filename : string, out database : Database ):bool
 	else
 		print "** Failed **"
 		print "Unable to open SQLite database file: %s", filename 
+		print "Message from SQLite: \"%s\"\n", database.errmsg()
+		return false
+
+def table_create( database: Database ):bool
+	sql:string
+	sql = """create table stage_hits ( ip_address varchar not null,
+				http_authenticated_name varchar not null,
+				time int not null,
+				http_method varchar not null,
+				http_path varchar not null,
+				http_version char(3) not null,
+				response_code char(3) not null,
+				body_bytes int not null,
+				referring_host varchar not null,
+				referring_uri_path varchar not null,
+				user_agent varchar not null
+				);"""
+	if database.exec( sql ) == Sqlite.OK
+		return true
+	else
+		print "** Failed **"
 		print "Message from SQLite: \"%s\"\n", database.errmsg()
 		return false
