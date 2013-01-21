@@ -1,2 +1,2 @@
 #!/bin/sh
-valac --pkg=sqlite3 stage_weblog.gs
+valac $1 --pkg=sqlite3 --pkg=gee-0.8 stage_weblog.gs

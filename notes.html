@@ -82,5 +82,32 @@ The date in the log file is of the format DD/MMM/YYYY:HH:MM:SS +/-TZ, where MMM 
 <tr><td>9</td><td>User Agent</td><td>user_agent varchar not null</td><td></td></tr>
 </table>
 
+<h2 id="parse_hits">Parse Each Hit</h2>
+<p>Each line of the log file is treated as an object. The hit object takes a line from the log file as an argument when it is instantiated. The fields in the line are parsed and allocated as properties of the hit object, for example as hit.ip_address.</p>
+<p>The line from the web log file is currently assumed to be in combined log file format, which has nine fields.</p>
+<p>There were a number of problems with Genie:</p>
+<dl>
+<dt><kbd>prop private <em>array</em></kbd> caused segv</dt>
+<dd>Work around was to use underscore instead of <kbd>prop private</kbd>, e.g. <kbd><em>_array</em></kbd></dd>
+<dt>Switch with case statements as expressions</dt>
+<dd>
+<pre>
+result : bool = true
+switch result
+	case (state == states.START) and (character == ' ')
+</pre>
+</dd>
+<dt>Multiple if statements</dt>
+<dd>
+<pre>
+if character == ' '
+	do_stuff()
+else if character == '['
+	do_other_stuff()
+else if character == '"'
+	do_something()
+</pre>
+</dd>
+</dl>
 
 </body>
