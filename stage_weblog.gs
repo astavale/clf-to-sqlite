@@ -12,9 +12,38 @@ init
 		return
 	if !table_create( database )
 		return
+	stmnt:Statement
+	database.prepare_v2( """insert into stage_hits ( ip_address,
+		http_authenticated_name,
+		time,
+		http_method,
+		http_path,
+		http_version,
+		response_code,
+		body_bytes,
+		referring_host,
+		referring_uri_path,
+		user_agent
+		)
+		values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )""", -1, out stmnt )
+	database.exec( "BEGIN TRANSACTION" )
 	logfile_line:string?
 	while (logfile_line = logfile.read_line()) != null
 		var hit = new log_hit( logfile_line )
+		stmnt.bind_text( 1, hit.ip_address )
+		stmnt.bind_text( 2, hit.http_user )
+		stmnt.bind_text( 3, hit.time )
+		stmnt.bind_text( 4, hit.request_line )
+		stmnt.bind_text( 5, hit.request_line )
+		stmnt.bind_text( 6, hit.request_line )
+		stmnt.bind_text( 7, hit.response_code )
+		stmnt.bind_text( 8, hit.body_length )
+		stmnt.bind_text( 9, hit.referrer )
+		stmnt.bind_text( 10, hit.referrer )
+		stmnt.bind_text( 11, hit.user_agent )
+		stmnt.step()
+		stmnt.reset()
+	database.exec( "END TRANSACTION" )
 
 def two_parameters( args : array of string):bool
 	if args.length == 3
