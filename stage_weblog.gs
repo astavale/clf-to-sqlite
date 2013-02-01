@@ -31,7 +31,10 @@ init
 	while (logfile_line = logfile.read_line()) != null
 		var hit = new log_hit( logfile_line )
 		stmnt.bind_text( 1, hit.ip_address )
-		stmnt.bind_text( 2, hit.http_user )
+		if hit.http_user == "-"
+			stmnt.bind_text( 2, "" )
+		else
+			stmnt.bind_text( 2, hit.http_user )
 		stmnt.bind_text( 3, hit.time )
 		stmnt.bind_text( 4, hit.request_line )
 		stmnt.bind_text( 5, hit.request_line )
