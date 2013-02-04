@@ -15,7 +15,7 @@ function run_test {
 	fi
 	}
 
-tests="test001 test002 test003 test004 test005 test006"
+tests="test001 test002 test003 test004 test005 test006 test007 test008"
 
 for test in $tests
 do	
