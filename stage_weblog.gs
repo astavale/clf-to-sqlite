@@ -46,9 +46,11 @@ init
 				break
 			offset++
 		stmnt.bind_int64( 3, time.mktime() - utc_offset )
-		stmnt.bind_text( 4, hit.request_line )
-		stmnt.bind_text( 5, hit.request_line )
-		stmnt.bind_text( 6, hit.request_line )
+		request_line : array of string
+		request_line = hit.request_line.split( " " )
+		stmnt.bind_text( 4, request_line[0] )
+		stmnt.bind_text( 5, request_line[1] )
+		stmnt.bind_text( 6, request_line[2][5:8] )
 		stmnt.bind_text( 7, hit.response_code )
 		stmnt.bind_text( 8, hit.body_length )
 		stmnt.bind_text( 9, hit.referrer )
