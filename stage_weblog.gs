@@ -52,7 +52,7 @@ init
 		stmnt.bind_text( 5, request_line[1] )
 		stmnt.bind_text( 6, request_line[2][5:8] )
 		stmnt.bind_text( 7, hit.response_code )
-		stmnt.bind_text( 8, hit.body_length )
+		stmnt.bind_int( 8, int.parse( hit.body_length ))
 		stmnt.bind_text( 9, hit.referrer )
 		stmnt.bind_text( 10, hit.referrer )
 		stmnt.bind_text( 11, hit.user_agent )
