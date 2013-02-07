@@ -55,6 +55,9 @@ p,ul,ol { margin: 0 0 1em 0; }
 <h2 id="opendb">Open Database</h2>
 <p>This takes the second command line parameter and attempts to open the file as an SQLite database for access.</p>
 <p>Only one test is needed for this section. That is to confirm an error message is given if the file can't be opened.</p>
+<p>There was a problem with Genue:</p>
+<p>At first the database was opened only for read/write access, this meant an error was produced if the database did not already exist. This was intended as a safeguard to stop databases being created if a typo was made and so only existing databases could be updated. This behaviour proved annoying when developing the program because a new SQLite database had to be created using a create table then drop table. To make the program create the database if it did not exist the <code>Sqlite.OPEN_READWRITE</code> flag was changed to <code>Sqlite.OPEN_CREATE</code> when the <code>open_v2</code> function was called. This change caused SQLite to create an "out of memory" error.</p> 
+<p>So the code <code>if Database.open_v2( filename, out database, Sqlite.OPEN_READWRITE ) == Sqlite.OK</code> was changed to <code>if Database.open_v2( filename, out database, Sqlite.OPEN_CREATE ) == Sqlite.OK</code>, but produced an "out of memory error" from SQLite. Instead <code>if Database.open( filename, out database ) == Sqlite.OK</code> had to be used.</p>
 
 <h2 id="dbtable">Create Database Staging Table</h2>
 <p>The program should exit if the table already exists. This is to ensure processing of an existing set of web server hits is not confused by the new data being loaded. When processing of the existing data is finished the database staging table should be dropped to signal a new load can happen.</p>

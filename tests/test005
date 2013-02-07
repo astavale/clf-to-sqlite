@@ -2,8 +2,14 @@
 
 test=test005
 
-echo -n "attempt to open non-existent database file......"
-$1 source_data/sample_log_file random_3ifjls4n > actual_results/$test
+echo -n "attempt to open an unreadable database file......"
+
+# Remove read access from file
+chmod -r source_data/$test.sqlite
+
+$1 source_data/sample_log_file source_data/$test.sqlite > actual_results/$test
+
+chmod +r source_data/$test.sqlite
 
 # Compare with expected results
 cmp --silent expected_results/$test actual_results/$test

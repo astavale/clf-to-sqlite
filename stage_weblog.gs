@@ -78,7 +78,7 @@ def logfile_open( filename : string, out filestream : FileStream ):bool
 		return false
 
 def database_open( filename : string, out database : Database ):bool
-	if Database.open_v2( filename, out database, Sqlite.OPEN_READWRITE ) == Sqlite.OK
+	if Database.open( filename, out database ) == Sqlite.OK
 		return true
 	else
 		print "** Failed **"
