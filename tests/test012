@@ -1,0 +1,20 @@
+#!/bin/sh
+
+test=test012
+
+echo -n "extract time and check UTC offset +0137 is applied when stored in database......"
+echo "create table test (test int);" | sqlite3 actual_results/$test.sqlite
+echo "drop table test;" | sqlite3 actual_results/$test.sqlite
+echo "drop table if exists stage_hits;" | sqlite3 actual_results/$test.sqlite
+$1 source_data/$test actual_results/$test.sqlite
+echo "select datetime(time, 'unixepoch') from stage_hits;" | sqlite3 actual_results/$test.sqlite > actual_results/$test
+
+# Compare with expected results
+cmp --silent expected_results/$test actual_results/$test
+
+if [ $? = 0 ]; then
+	rm actual_results/$test.sqlite
+	exit 0
+else
+	exit 1
+fi

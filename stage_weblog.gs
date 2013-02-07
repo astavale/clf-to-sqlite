@@ -35,7 +35,17 @@ init
 			stmnt.bind_text( 2, "" )
 		else
 			stmnt.bind_text( 2, hit.http_user )
-		stmnt.bind_text( 3, hit.time )
+		time:Time = Time.gm(0)
+		time.strptime( hit.time, "%d/%b/%Y:%T" )
+		utc_offset : int = 0
+		offset : int = 0
+		while offset < hit.time.length
+			if hit.time[ offset ] == '+' or hit.time[ offset ] == '-'
+				utc_offset = int.parse( hit.time[offset:offset+3] ) * 3600
+				utc_offset += int.parse( hit.time[offset:offset+1]+hit.time[offset+3:offset+5] ) * 60
+				break
+			offset++
+		stmnt.bind_int64( 3, time.mktime() - utc_offset )
 		stmnt.bind_text( 4, hit.request_line )
 		stmnt.bind_text( 5, hit.request_line )
 		stmnt.bind_text( 6, hit.request_line )
@@ -80,7 +90,7 @@ def table_create( database: Database ):bool
 	sql:string
 	sql = """create table stage_hits ( ip_address varchar not null,
 				http_authenticated_name varchar not null,
-				time int not null,
+				time bigint not null,
 				http_method varchar not null,
 				http_path varchar not null,
 				http_version char(3) not null,
