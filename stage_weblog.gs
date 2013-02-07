@@ -53,8 +53,16 @@ init
 		stmnt.bind_text( 6, request_line[2][5:8] )
 		stmnt.bind_text( 7, hit.response_code )
 		stmnt.bind_int( 8, int.parse( hit.body_length ))
-		stmnt.bind_text( 9, hit.referrer )
-		stmnt.bind_text( 10, hit.referrer )
+		referrer_host : string = ""
+		referrer_path : string = ""
+		start : int = hit.referrer.index_of( "//" )
+		if start > 0
+			start += 2
+			end : int = hit.referrer.index_of( "/", start ) 
+			referrer_host = hit.referrer[ start:end ]
+			referrer_path = hit.referrer[ end:hit.referrer.length ]
+		stmnt.bind_text( 9, referrer_host )
+		stmnt.bind_text( 10, referrer_path )
 		stmnt.bind_text( 11, hit.user_agent )
 		stmnt.step()
 		stmnt.reset()
