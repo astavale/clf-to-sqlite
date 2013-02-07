@@ -1,0 +1,18 @@
+#!/bin/sh
+
+test=test022
+
+echo -n "extract empty HTTP authenticated user name field and check stored in database......"
+touch actual_results/$test.sqlite
+$1 source_data/$test actual_results/$test.sqlite
+echo "select http_authenticated_name from stage_hits;" | sqlite3 actual_results/$test.sqlite > actual_results/$test
+
+# Compare with expected results
+cmp --silent expected_results/$test actual_results/$test
+
+if [ $? = 0 ]; then
+	rm actual_results/$test.sqlite
+	exit 0
+else
+	exit 1
+fi
