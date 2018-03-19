@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <head>
 <style type="text/css">
-body { width: 55em;
+body { width: 35em;
 	margin: 0 auto;
 	padding: 0 0 4em 0;
-	font-family: arial, helvetica, sans-serif;
-	}
+	font-family: sans-serif;
+}
 h1,h2 { margin: 1em 0 0 0; }
 p,ul,ol { margin: 0 0 1em 0; }
+table { table-layout: fixed;
+	width: 100%;
+	word-wrap: break-word;
+}
 </style>
 <title>Extract Web Log Data and Load to Database with Genie</title>
+<meta charset="UTF-8" />
 </head>
+
 <body>
-<h1>Extract Web Log Data and Load to Database with Genie</h1>
+<h1>Common Log Format to SQLite</h1>
+
 <h2>Contents</h2>
 <ol>
 <li><a href="#intro">Introduction</a></li>
@@ -27,9 +34,19 @@ p,ul,ol { margin: 0 0 1em 0; }
 <li><a href="#report">Increment Counter and Produce Report at End</a></li>
 </ol>
 </li>
+<li><a href="#bugs">Bugs</a>:
+<ol>
+<li><a href="#escaped_hits">Escaped Characters in Log</a></li>
+</ol>
+</li>
 </ol>
 
+
 <h2 id="intro">Introduction</h2>
+<p><code>clf-to-sqlite</code> is a command line program to extract entries from <a href="https://en.wikipedia.org/wiki/Common_Log_Format" target="_blank">Common Log Format</a> web logs and load the parsed lines into an SQLite database.</p>
+
+<p>The program is written in <a href="https://wiki.gnome.org/Projects/Genie/" target="_blank">Genie</a> for performance. The program will typically extract, parse and load 300,000 log entries into an SQLite database in ~7 seconds on a 2.5GHz CPU. The program is single threaded.</p>
+
 <p>Two file names should be passed as parameters to the program. The first points to the web log to be processed. The second points to the SQLite database to store the web server hits in a staging table.</p>
 <p>A web server hit is stored using nine fields in the web log. This is the combined log format:</p>
 <ol>
@@ -44,25 +61,30 @@ p,ul,ol { margin: 0 0 1em 0; }
 <li>User agent</li>
 </ol>
 
+
 <h2 id="getopts">Parse Command Line Arguments</h2>
 <p>The program takes two command line parameters:</p>
 <p><kbd>stage_weblog log_filename sqlite_database_filename</kbd></p>
+
 
 <h2 id="openfile">Open Log File</h2>
 <p>This takes the first command line parameter and attempts to open the file for reading.</p>
 <p>Only one test is needed for this section. That is to confirm an error message is given if the file can't be opened.</p>
 
+
 <h2 id="opendb">Open Database</h2>
 <p>This takes the second command line parameter and attempts to open the file as an SQLite database for access.</p>
 <p>Only one test is needed for this section. That is to confirm an error message is given if the file can't be opened.</p>
-<p>There was a problem with Genue:</p>
+<p>There was a problem with Genie:</p>
 <p>At first the database was opened only for read/write access, this meant an error was produced if the database did not already exist. This was intended as a safeguard to stop databases being created if a typo was made and so only existing databases could be updated. This behaviour proved annoying when developing the program because a new SQLite database had to be created using a create table then drop table. To make the program create the database if it did not exist the <code>Sqlite.OPEN_READWRITE</code> flag was changed to <code>Sqlite.OPEN_CREATE</code> when the <code>open_v2</code> function was called. This change caused SQLite to create an "out of memory" error.</p> 
 <p>So the code <code>if Database.open_v2( filename, out database, Sqlite.OPEN_READWRITE ) == Sqlite.OK</code> was changed to <code>if Database.open_v2( filename, out database, Sqlite.OPEN_CREATE ) == Sqlite.OK</code>, but produced an "out of memory error" from SQLite. Instead <code>if Database.open( filename, out database ) == Sqlite.OK</code> had to be used.</p>
 
+
 <h2 id="dbtable">Create Database Staging Table</h2>
 <p>The program should exit if the table already exists. This is to ensure processing of an existing set of web server hits is not confused by the new data being loaded. When processing of the existing data is finished the database staging table should be dropped to signal a new load can happen.</p>
+
 <table border="1">
-<tr><th>Position</th><th>Field description</th><th>Hit Object Property Name</th><th>Database column</th><th>Comments</th></tr>
+<tr><th style="width: 4.5em;">Position</th><th style="width: 5em;">Field</th><th style="width: 6em;">Hit Object Property</th><th style="width: 6em;">Database column</th><th>Comments</th></tr>
 <tr><td>1</td><td>IP address</td><td>ip_address</td><td>ip_address varchar not null</td><td>Needs to store both IPv4 and IPv6 addresses. Although IPv4 addresses could be stored as a 32bit unsigned integer using the <a href="http://www.kernel.org/doc/man-pages/online/pages/man3/inet_pton.3.html">inet_pton</a> to translate the text to binary form, binary IPv6 addresses are too long to be stored as an integer in SQLite. The maximum integer size is eight bytes in SQLite, but an IPv6 address is sixteen bytes, so to cater for both IPv4 and IPv6 the text datatype is used.</td></tr>
 <tr><td>2</td><td>TCP ident (not used)</td><td>tcp_ident</td><td></td><td></td></tr>
 <tr><td>3</td><td>HTTP authenticated user name</td><td>http_user</td><td>http_authenticated_name varchar not null</td><td>This is not usually used, so the empty value of dash, '-', will appear in most files. This should be converted to an empty string, '', for storage in the staging table.</td></tr>
@@ -85,6 +107,7 @@ p,ul,ol { margin: 0 0 1em 0; }
 <tr><td>referring_uri_path varchar not null</td><td></td></tr>
 <tr><td>9</td><td>User Agent</td><td>user_agent</td><td>user_agent varchar not null</td><td></td></tr>
 </table>
+
 
 <h2 id="parse_hits">Parse Each Hit</h2>
 <p>Each line of the log file is treated as an object. The hit object takes a line from the log file as an argument when it is instantiated. The fields in the line are parsed and allocated as properties of the hit object, for example as hit.ip_address.</p>
@@ -114,8 +137,26 @@ else if character == '"'
 </dd>
 </dl>
 
+
 <h2 id="insert_hits">Insert Each Hit into Database</h2>
 <p>The INSERT statement was created as a prepared statement using the SQLite prepare_v2() function.</p>
 <p>Then during the web log reading loop each field from the log was bound to the relevant field in the prepared SQL statement using the SQLite bind_text() call. The INSERT statement is then run using the SQLite step() function and then the prepared statement is reset for new values with SQLite's reset() function. This method took just over a minute to read 3134 hits into the database. By wrapping the loop in a transaction with database.exec( "BEGIN TRANSACTION" ) and database.exec( "END TRANSACTION" ) the time was reduced to just under half a second, which was about 120 times faster.</p>
 
+<h2 id="bugs">Bugs</h2>
+<h3 id="escaped_hits">Escaped Characters in Log</h3>
+<p>The following lines from a web log are causing a Glib error ( <output>CRITICAL **: string_slice: assertion `self != NULL' failed</output> ):</p>
+<pre>
+80.152.182.125 - - [10/Apr/2013:23:43:08 +0100] "GET /\"+b.src+\" HTTP/1.1" 302 296 "-" "Java/1.6.0_37"
+209.235.32.244 - - [12/Apr/2013:12:42:17 +0100] "GET /\"+b.src+\" HTTP/1.1" 302 296 "-" "Java/1.7.0_13"
+66.129.74.150 - - [13/Apr/2013:11:19:57 +0100] "GET /\"+b.src+\" HTTP/1.1" 302 296 "-" "Java/1.7.0_17"
+</pre>
+<p>The error means the lines are not added to the database, but the processing of all other lines continues. So the result is the loss of three lines.</p>
+<p>The problem is the GET request that has an escape double quote character in it.</p>
+<p>Process to fix:</p>
+<ol>
+<li>Research whether Apache inserts escape sequence or it is from the user agent</li>
+<li>Add fix to Genie parsing program</li>
+</ol>
+<p>This is a time consuming fix and because it only occurs with malformed requests from bots it is not a priority.</p>
+<p><a href="http://www.ruby-forum.com/topic/138852">Escape characters in log files</a> - excellent forum post, including a patch for nginx to make it the same as Apache. Explains exactly what is happening.</p>
 </body>
