@@ -1,2 +1,14 @@
 #!/bin/sh
-valac $1 --pkg=sqlite3 --pkg=gee-0.8 stage_weblog.gs
+if [ !-v $VALAC ]
+then
+	VALAC=valac
+fi
+
+$VALAC $1 \
+	--pkg=sqlite3 \
+	--pkg=gee-0.8 \
+	-X -D_XOPEN_SOURCE \
+	stage_weblog.gs \
+	src/LogHit.gs
+# _XOPEN_SOURCE feature test macro is needed to use strptime without warning
+# https://stackoverflow.com/questions/43460876/trouble-including-function-declaration-for-strptime
