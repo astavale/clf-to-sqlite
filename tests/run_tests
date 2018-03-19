@@ -1,5 +1,5 @@
 #!/bin/sh
-program=../stage_weblog
+program=../clf-to-sqlite
 if [ ! -d actual_results ]; then
 	mkdir actual_results
 fi
@@ -22,6 +22,6 @@ tests="test001 test002 test003 test004 test005 test006 test007 test008\
  test019 test020 test021 test022 test023 test024 test025"
 
 for test in $tests
-do	
+do
 	run_test $test
 done
