@@ -1,9 +1,10 @@
 #!/bin/sh
 
-test=test006
+test=$(basename $0)
+test_source_dir=$(dirname $0)
 
 echo -n "attempt to create database table when table already exists......"
-$1 source_data/sample_log_file source_data/test006.sqlite > actual_results/$test
+$1 $test_source_dir/source_data/sample_log_file $test_source_dir/source_data/test006.sqlite > actual_results/$test
 
 # Compare with expected results
-cmp --silent expected_results/$test actual_results/$test
+cmp --silent $(dirname $0)/expected_results/$test actual_results/$test

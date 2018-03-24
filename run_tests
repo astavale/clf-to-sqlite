@@ -1,14 +1,14 @@
 #!/bin/sh
-program=../clf-to-sqlite
+test_subject=$MESON_BUILD_ROOT/clf-to-sqlite
 
-if [ ! -d tests/actual_results ]; then
-	mkdir tests/actual_results
+if [ ! -d $MESON_BUILD_ROOT/tests/actual_results ]; then
+	mkdir $MESON_BUILD_ROOT/tests/actual_results --parents
 fi
-rm test/actual_results/* -f
+rm $MESON_BUILD_ROOT/test/actual_results/* -f
 
 function run_test {
 	echo -n "$1......"
-	./$1 $program
+	$MESON_SOURCE_ROOT/tests/$1 $test_subject
 	if [ $? != 0 ]; then
 		echo "failed"
 		exit 1
@@ -21,9 +21,10 @@ tests="test001 test002 test003 test004 test005 test006 test007 test008 \
  test009 test010 test011 test012 test013 test014 test015 test016 test017 test018 \
  test019 test020 test021 test022 test023 test024 test025"
 
-cd tests
+cwd=$PWD
+cd $MESON_BUILD_ROOT/tests
 for test in $tests
 do
 	run_test $test
 done
-cd ..
+cd $cwd

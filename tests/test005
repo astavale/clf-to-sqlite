@@ -1,15 +1,19 @@
 #!/bin/sh
 
-test=test005
+test=$(basename $0)
+test_source_dir=$(dirname $0)
 
 echo -n "attempt to open an unreadable database file......"
 
 # Remove read access from file
-chmod -r source_data/$test.sqlite
+chmod -r $test_source_dir/source_data/$test.sqlite
 
-$1 source_data/sample_log_file source_data/$test.sqlite > actual_results/$test
+test_build_dir=$PWD
+cd $test_source_dir
+$1 source_data/sample_log_file source_data/$test.sqlite > $test_build_dir/actual_results/$test
+cd $test_build_dir
 
-chmod +r source_data/$test.sqlite
+chmod +r $test_source_dir/source_data/$test.sqlite
 
 # Compare with expected results
-cmp --silent expected_results/$test actual_results/$test
+cmp --silent $test_source_dir/expected_results/$test actual_results/$test

@@ -1,14 +1,15 @@
 #!/bin/sh
 
-test=test021
+test=$(basename $0)
+test_source_dir=$(dirname $0)
 
 echo -n "extract referring URI path and check stored in database......"
 touch actual_results/$test.sqlite
-$1 source_data/$test actual_results/$test.sqlite
+$1 $test_source_dir/source_data/$test actual_results/$test.sqlite
 echo "select referring_uri_path from stage_hits;" | sqlite3 actual_results/$test.sqlite > actual_results/$test
 
 # Compare with expected results
-cmp --silent expected_results/$test actual_results/$test
+cmp --silent $test_source_dir/expected_results/$test actual_results/$test
 
 if [ $? = 0 ]; then
 	rm actual_results/$test.sqlite

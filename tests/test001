@@ -1,10 +1,9 @@
 #!/bin/sh
 
-test=test001
+test=$(basename $0)
 
 echo -n "run with no parameters......"
 $1 > actual_results/$test
 
 # Compare with expected results
-cmp --silent expected_results/$test actual_results/$test
- 
+cmp --silent $(dirname $0)/expected_results/$test actual_results/$test
