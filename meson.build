@@ -22,7 +22,7 @@ executable(
 	dependencies: dependencies,
 )
 
-tests = find_program( 'run_tests' )
+tests = find_program( 'test_runner' )
 
 env = environment()
 env.set( 'MESON_SOURCE_ROOT', meson.source_root() )
