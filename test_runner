@@ -1,10 +1,41 @@
 #!/bin/sh
-test_subject=$MESON_BUILD_ROOT/clf-to-sqlite
 
-if [ ! -d $MESON_BUILD_ROOT/tests/actual_results ]; then
-	mkdir $MESON_BUILD_ROOT/tests/actual_results --parents
+tests="test001 test002 test003 test004 test005 test006 test007 test008 \
+ test009 test010 test011 test012 test013 test014 test015 test016 test017 test018 \
+ test019 test020 test021 test022 test023 test024 test025"
+
+case "$1" in
+
+"list")
+	for test in $tests
+	do
+		echo $test
+	done
+	exit
+	;;
+"run")
+	;;
+*)
+	printf 'Usage:\n'
+	printf "    $(basename $0) <command>\n"
+	printf '\n'
+	echo \<command\> can be:
+	printf '    list	- list tests\n'
+	exit 1
+	;;
+esac
+
+if ! [ -v MESON_BUILD_ROOT ]
+then MESON_BUILD_ROOT=$PWD/builddir
+echo No MESON_BUILD_ROOT environment variable set. Defaulting to: $MESON_BUILD_ROOT
 fi
-rm $MESON_BUILD_ROOT/test/actual_results/* -f
+
+if ! [ -v MESON_SOURCE_ROOT ]
+then MESON_SOURCE_ROOT=$PWD
+echo No MESON_SOURCE_ROOT environment variable set. Defaulting to: $MESON_SOURCE_ROOT
+fi
+
+test_subject=$MESON_BUILD_ROOT/clf-to-sqlite
 
 function run_test {
 	echo -n "$1......"
@@ -17,9 +48,14 @@ function run_test {
 	fi
 	}
 
-tests="test001 test002 test003 test004 test005 test006 test007 test008 \
- test009 test010 test011 test012 test013 test014 test015 test016 test017 test018 \
- test019 test020 test021 test022 test023 test024 test025"
+if [ ! -d $MESON_BUILD_ROOT/tests/actual_results ]; then
+	mkdir $MESON_BUILD_ROOT/tests/actual_results --parents
+fi
+rm $MESON_BUILD_ROOT/test/actual_results/* -f
+
+if [ ! -z "$2" ]
+then tests=$2
+fi
 
 cwd=$PWD
 cd $MESON_BUILD_ROOT/tests
