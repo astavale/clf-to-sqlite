@@ -1,4 +1,10 @@
 #!/bin/sh
+description="a CLF entry with an HTTP authenticated user name should have the HTTP authenticated name stored correctly"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 test_source_dir=$(dirname $0)

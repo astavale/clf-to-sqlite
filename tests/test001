@@ -1,8 +1,13 @@
 #!/bin/sh
+description="command line interface with no arguments should show a message"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 
-echo -n "run with no parameters......"
 $1 > actual_results/$test
 
 # Compare with expected results

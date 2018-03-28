@@ -4,6 +4,7 @@ tests="test001 test002 test003 test004 test005 test006 test007 test008 \
  test009 test010 test011 test012 test013 test014 test015 test016 test017 test018 \
  test019 test020 test021 test022 test023 test024 test025"
 
+command=""
 case "$1" in
 
 "list")
@@ -13,7 +14,11 @@ case "$1" in
 	done
 	exit
 	;;
+"describe")
+	command=describe
+	;;
 "run")
+	command=run
 	;;
 *)
 	printf 'Usage:\n'
@@ -35,16 +40,22 @@ then MESON_SOURCE_ROOT=$PWD
 echo No MESON_SOURCE_ROOT environment variable set. Defaulting to: $MESON_SOURCE_ROOT
 fi
 
+if [ $command == "describe" ]
+then echo -n $($MESON_SOURCE_ROOT/tests/$2 describe)
+exit
+fi
+
 test_subject=$MESON_BUILD_ROOT/clf-to-sqlite
 
 function run_test {
 	echo -n "$1......"
+	$MESON_SOURCE_ROOT/tests/$1 describe
 	$MESON_SOURCE_ROOT/tests/$1 $test_subject
 	if [ $? != 0 ]; then
-		echo "failed"
+		echo ......FAIL
 		exit 1
 	else
-		echo "passed"
+		echo ......OK
 	fi
 	}
 

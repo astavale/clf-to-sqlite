@@ -1,9 +1,14 @@
 #!/bin/sh
+description="given a database table already exists then creating it again should be an error"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 test_source_dir=$(dirname $0)
 
-echo -n "attempt to create database table when table already exists......"
 $1 $test_source_dir/source_data/sample_log_file $test_source_dir/source_data/test006.sqlite > actual_results/$test
 
 # Compare with expected results

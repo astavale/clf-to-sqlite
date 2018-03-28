@@ -1,9 +1,14 @@
 #!/bin/sh
+description="a CLF entry should have the HTTP response code stored correctly"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 test_source_dir=$(dirname $0)
 
-echo -n "extract server response code and check stored in database......"
 touch actual_results/$test.sqlite
 $1 $test_source_dir/source_data/$test actual_results/$test.sqlite
 echo "select response_code from stage_hits;" | sqlite3 actual_results/$test.sqlite > actual_results/$test

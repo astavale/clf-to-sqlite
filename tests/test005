@@ -1,9 +1,13 @@
 #!/bin/sh
+description="passing an unreadable database file should be an error"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 test_source_dir=$(dirname $0)
-
-echo -n "attempt to open an unreadable database file......"
 
 # Remove read access from file
 chmod -r $test_source_dir/source_data/$test.sqlite

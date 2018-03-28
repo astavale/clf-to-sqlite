@@ -1,9 +1,14 @@
 #!/bin/sh
+description="a CLF entry should have the HTTP method stored correctly"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 test_source_dir=$(dirname $0)
 
-echo -n "extract HTTP request line and check HTTP method stored in database......"
 touch actual_results/$test.sqlite
 $1 $test_source_dir/source_data/$test actual_results/$test.sqlite
 echo "select http_method from stage_hits;" | sqlite3 actual_results/$test.sqlite > actual_results/$test

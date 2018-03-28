@@ -1,9 +1,14 @@
 #!/bin/sh
+description="a CLF entry with UTC time offset -0037 should have the datetime stored correctly"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 test_source_dir=$(dirname $0)
 
-echo -n "extract time and check UTC offset -0037 is applied when stored in database......"
 echo "create table test (test int);" | sqlite3 actual_results/$test.sqlite
 echo "drop table test;" | sqlite3 actual_results/$test.sqlite
 echo "drop table if exists stage_hits;" | sqlite3 actual_results/$test.sqlite

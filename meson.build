@@ -30,6 +30,7 @@ foreach test : test_list
 env = environment()
 env.set( 'MESON_SOURCE_ROOT', meson.source_root() )
 env.set( 'MESON_BUILD_ROOT', meson.build_root() )
-test( test, test_runner, args: ['run', test], env: env )
+description = run_command( test_runner, 'describe', test ).stdout()
+test( description, test_runner, args: ['run', test], env: env )
 
 endforeach

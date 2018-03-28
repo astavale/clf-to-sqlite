@@ -1,8 +1,13 @@
 #!/bin/sh
+description="passing a non-existent log file should be an error"
+
+if [ $1 == 'describe' ]
+then echo -n $description
+exit
+fi
 
 test=$(basename $0)
 
-echo -n "attempt to open non-existent web log file......"
 $1 random_jklfe67ql random_pmfwds > actual_results/$test
 
 # Compare with expected results
