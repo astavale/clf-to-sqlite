@@ -24,13 +24,12 @@ executable(
 
 test_runner = find_program( 'test_runner' )
 
-test_list = run_command( test_runner, 'list' ).stdout().split()
-foreach test : test_list
-
 env = environment()
 env.set( 'MESON_SOURCE_ROOT', meson.source_root() )
 env.set( 'MESON_BUILD_ROOT', meson.build_root() )
-description = run_command( test_runner, 'describe', test ).stdout()
-test( description, test_runner, args: ['run', test], env: env )
 
+test_list = run_command( test_runner, 'list' ).stdout().split()
+foreach test : test_list
+	description = run_command( test_runner, 'describe', test ).stdout()
+	test( description, test_runner, args: ['run', test], env: env )
 endforeach
