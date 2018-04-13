@@ -18,7 +18,7 @@ table { table-layout: fixed;
 </head>
 
 <body>
-<h1>Common Log Format to SQLite</h1>
+<h1>Combined Log Format to SQLite</h1>
 
 <h2>Contents</h2>
 <ol>
@@ -43,7 +43,7 @@ table { table-layout: fixed;
 
 
 <h2 id="intro">Introduction</h2>
-<p><code>clf-to-sqlite</code> is a command line program to extract entries from <a href="https://en.wikipedia.org/wiki/Common_Log_Format" target="_blank">Common Log Format</a> web logs and load the parsed lines into an SQLite database.</p>
+<p><code>clf-to-sqlite</code> is a command line program to extract entries from <a href="http://httpd.apache.org/docs/current/logs.html#combined" target="_blank">Combined Log Format</a> web logs and load the parsed lines into an SQLite database.</p>
 
 <p>The program is written in <a href="https://wiki.gnome.org/Projects/Genie/" target="_blank">Genie</a> for performance. The program will typically extract, parse and load 300,000 log entries into an SQLite database in ~7 seconds on a 2.5GHz CPU. The program is single threaded.</p>
 
