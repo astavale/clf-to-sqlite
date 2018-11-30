@@ -1,54 +1,62 @@
 class LogHit
 	enum Formats
 		COMBINED
+
 	enum States
 		START
 		END
-	_format:Formats
-	_logline_value:string
+
 	prop logline:string
 		get
 			return _logline_value
 		set
 			_logline_value = value
-	_fields : array of string[]
-	prop readonly ip_address:string
+
+	prop readonly domain:string
 		get
 			return _fields[0]
-	prop readonly tcp_ident:string
+	prop readonly ip_address:string
 		get
 			return _fields[1]
-	prop readonly http_user:string
+	prop readonly tcp_ident:string
 		get
 			return _fields[2]
-	prop readonly time:string
+	prop readonly http_user:string
 		get
 			return _fields[3]
-	prop readonly request_line:string
+	prop readonly time:string
 		get
 			return _fields[4]
-	prop readonly response_code:string
+	prop readonly request_line:string
 		get
 			return _fields[5]
-	prop readonly body_length:string
+	prop readonly response_code:string
 		get
 			return _fields[6]
-	prop readonly referrer:string
+	prop readonly body_length:string
 		get
 			return _fields[7]
-	prop readonly user_agent:string
+	prop readonly referrer:string
 		get
 			return _fields[8]
-	construct ( line : string, logformat:Formats = Formats.COMBINED )
+	prop readonly user_agent:string
+		get
+			return _fields[9]
+
+	_format:Formats
+	_logline_value:string
+	_fields:array of string[] = new array of string[10]
+
+	construct ( line:string, logformat:Formats = Formats.COMBINED )
 		_format = logformat
 		if _format != Formats.COMBINED
 			print "Can only process combined log format"
 			return
 		logline = line
-		_fields = new array of string[10]
+		_fields[0] = ""
 		end:int = 0
 		start:int = 0
-		field:int = 0
+		field:int = 1
 		state:States = States.START
 		terminator:char = ' '
 		while end < logline.length
@@ -81,8 +89,7 @@ class LogHit
 					state = States.START
 					terminator = ' '
 					field++
-					if field > 8
+					if field > 9
 						break
 				else
 					end++
-
