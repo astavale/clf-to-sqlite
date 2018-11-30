@@ -4,7 +4,7 @@
 body { width: 35em;
 	margin: 0 auto;
 	padding: 0 0 4em 0;
-	font-family: sans-serif;
+	font-family: 'Droid Sans', sans-serif;
 }
 h1,h2 { margin: 1em 0 0 0; }
 p,ul,ol { margin: 0 0 1em 0; }
@@ -20,10 +20,11 @@ table { table-layout: fixed;
 <body>
 <h1>Combined Log Format to SQLite</h1>
 
+
 <h2>Contents</h2>
 <ol>
 <li><a href="#intro">Introduction</a></li>
-<li>Stages of development:
+<li><a href="#stages">Stages of development</a>:
 <ol>
 <li><a href="#getopts">Parse Command Line Arguments</a></li>
 <li><a href="#openfile">Open Log File</a></li>
@@ -62,17 +63,20 @@ table { table-layout: fixed;
 </ol>
 
 
-<h2 id="getopts">Parse Command Line Arguments</h2>
+<h2 id="stages">Stages of development</h2>
+
+
+<h3 id="getopts">Parse Command Line Arguments</h3>
 <p>The program takes two command line parameters:</p>
 <p><kbd>stage_weblog log_filename sqlite_database_filename</kbd></p>
 
 
-<h2 id="openfile">Open Log File</h2>
+<h3 id="openfile">Open Log File</h3>
 <p>This takes the first command line parameter and attempts to open the file for reading.</p>
 <p>Only one test is needed for this section. That is to confirm an error message is given if the file can't be opened.</p>
 
 
-<h2 id="opendb">Open Database</h2>
+<h3 id="opendb">Open Database</h3>
 <p>This takes the second command line parameter and attempts to open the file as an SQLite database for access.</p>
 <p>Only one test is needed for this section. That is to confirm an error message is given if the file can't be opened.</p>
 <p>There was a problem with Genie:</p>
@@ -80,15 +84,16 @@ table { table-layout: fixed;
 <p>So the code <code>if Database.open_v2( filename, out database, Sqlite.OPEN_READWRITE ) == Sqlite.OK</code> was changed to <code>if Database.open_v2( filename, out database, Sqlite.OPEN_CREATE ) == Sqlite.OK</code>, but produced an "out of memory error" from SQLite. Instead <code>if Database.open( filename, out database ) == Sqlite.OK</code> had to be used.</p>
 
 
-<h2 id="dbtable">Create Database Staging Table</h2>
+<h3 id="dbtable">Create Database Staging Table</h3>
 <p>The program should exit if the table already exists. This is to ensure processing of an existing set of web server hits is not confused by the new data being loaded. When processing of the existing data is finished the database staging table should be dropped to signal a new load can happen.</p>
 
 <table border="1">
 <tr><th style="width: 4.5em;">Position</th><th style="width: 5em;">Field</th><th style="width: 6em;">Hit Object Property</th><th style="width: 6em;">Database column</th><th>Comments</th></tr>
-<tr><td>1</td><td>IP address</td><td>ip_address</td><td>ip_address varchar not null</td><td>Needs to store both IPv4 and IPv6 addresses. Although IPv4 addresses could be stored as a 32bit unsigned integer using the <a href="http://www.kernel.org/doc/man-pages/online/pages/man3/inet_pton.3.html">inet_pton</a> to translate the text to binary form, binary IPv6 addresses are too long to be stored as an integer in SQLite. The maximum integer size is eight bytes in SQLite, but an IPv6 address is sixteen bytes, so to cater for both IPv4 and IPv6 the text datatype is used.</td></tr>
-<tr><td>2</td><td>TCP ident (not used)</td><td>tcp_ident</td><td></td><td></td></tr>
-<tr><td>3</td><td>HTTP authenticated user name</td><td>http_user</td><td>http_authenticated_name varchar not null</td><td>This is not usually used, so the empty value of dash, '-', will appear in most files. This should be converted to an empty string, '', for storage in the staging table.</td></tr>
-<tr><td>4</td><td>Time</td><td>time</td><td>time bigint not null</td><td>SQLite does not have a datetime type, but it is recommended to handle date/times using one of three other datatypes:
+<tr><td>1</td><td>Domain name</td><td>domain</td><td>domain_name varchar not null</td><td>Domain name the log file is associated with, the default is an empty string</td></tr>
+<tr><td>2</td><td>IP address</td><td>ip_address</td><td>ip_address varchar not null</td><td>Needs to store both IPv4 and IPv6 addresses. Although IPv4 addresses could be stored as a 32bit unsigned integer using the <a href="http://www.kernel.org/doc/man-pages/online/pages/man3/inet_pton.3.html">inet_pton</a> to translate the text to binary form, binary IPv6 addresses are too long to be stored as an integer in SQLite. The maximum integer size is eight bytes in SQLite, but an IPv6 address is sixteen bytes, so to cater for both IPv4 and IPv6 the text datatype is used.</td></tr>
+<tr><td>3</td><td>TCP ident (not used)</td><td>tcp_ident</td><td></td><td></td></tr>
+<tr><td>4</td><td>HTTP authenticated user name</td><td>http_user</td><td>http_authenticated_name varchar not null</td><td>This is not usually used, so the empty value of dash, '-', will appear in most files. This should be converted to an empty string, '', for storage in the staging table.</td></tr>
+<tr><td>5</td><td>Time</td><td>time</td><td>time bigint not null</td><td>SQLite does not have a datetime type, but it is recommended to handle date/times using one of three other datatypes:
 <ol>
 <li>TEXT - Using ISO-8601 format makes date/times sortable</li>
 <li>INT - Unix epoch time, i.e. seconds from midnight 01 Jan 1970 UTC</li>
@@ -98,18 +103,18 @@ table { table-layout: fixed;
 <p>For Genie the functions are: <a href="http://valadoc.org/#!api=glib-2.0/GLib.Time.strptime">GLib.Time.strptime</a> and <a href="http://valadoc.org/#!api=glib-2.0/GLib.Time.strftime">GLib.Time.strftime</a></p>
 <p>Unix time is represent as the <code>time_t</code> datatype in C. This is platform dependent, but must be either <a href="http://pubs.opengroup.org/onlinepubs/009695399/basedefs/sys/types.h.html">an integer or float</a>. Linux and glibc seem to use a 64 bit integer so the non-standard SQL bigint datatype was chosen. The SQL standard only defines smallint and int, but many databases implement bigint. SQLite implements a variable length int, up to eight bytes (64 bits) long.</p> 
 </td></tr>
-<tr><td rowspan="3">5</td><td rowspan="3">HTTP request line</td><td rowspan="3">request_line</td><td>http_method varchar not null</td><td></td></tr>
+<tr><td rowspan="3">6</td><td rowspan="3">HTTP request line</td><td rowspan="3">request_line</td><td>http_method varchar not null</td><td></td></tr>
 <tr><td>http_path varchar not null</td><td></td></tr>
 <tr><td>http_version char(3) not null</td><td></td></tr>
-<tr><td>6</td><td>Server response code</td><td>response_code</td><td>response_code char(3) not null</td><td></td></tr>
-<tr><td>7</td><td>Body length</td><td>body_length</td><td>body_bytes int not null</td><td></td></tr>
-<tr><td rowspan="2">8</td><td rowspan="2">Referrer</td><td rowspan="2">referrer</td><td>referring_host varchar not null</td><td></td></tr>
+<tr><td>7</td><td>Server response code</td><td>response_code</td><td>response_code char(3) not null</td><td></td></tr>
+<tr><td>8</td><td>Body length</td><td>body_length</td><td>body_bytes int not null</td><td></td></tr>
+<tr><td rowspan="2">9</td><td rowspan="2">Referrer</td><td rowspan="2">referrer</td><td>referring_host varchar not null</td><td></td></tr>
 <tr><td>referring_uri_path varchar not null</td><td></td></tr>
-<tr><td>9</td><td>User Agent</td><td>user_agent</td><td>user_agent varchar not null</td><td></td></tr>
+<tr><td>10</td><td>User Agent</td><td>user_agent</td><td>user_agent varchar not null</td><td></td></tr>
 </table>
 
 
-<h2 id="parse_hits">Parse Each Hit</h2>
+<h3 id="parse_hits">Parse Each Hit</h3>
 <p>Each line of the log file is treated as an object. The hit object takes a line from the log file as an argument when it is instantiated. The fields in the line are parsed and allocated as properties of the hit object, for example as hit.ip_address.</p>
 <p>The line from the web log file is currently assumed to be in combined log file format, which has nine fields.</p>
 <p>There were a number of problems with Genie:</p>
@@ -138,9 +143,14 @@ else if character == '"'
 </dl>
 
 
-<h2 id="insert_hits">Insert Each Hit into Database</h2>
+<h3 id="insert_hits">Insert Each Hit into Database</h3>
 <p>The INSERT statement was created as a prepared statement using the SQLite prepare_v2() function.</p>
 <p>Then during the web log reading loop each field from the log was bound to the relevant field in the prepared SQL statement using the SQLite bind_text() call. The INSERT statement is then run using the SQLite step() function and then the prepared statement is reset for new values with SQLite's reset() function. This method took just over a minute to read 3134 hits into the database. By wrapping the loop in a transaction with database.exec( "BEGIN TRANSACTION" ) and database.exec( "END TRANSACTION" ) the time was reduced to just under half a second, which was about 120 times faster.</p>
+
+
+<h3 id="report">Increment Counter and Produce Report at End</h3>
+<p>To do...</p>
+
 
 <h2 id="bugs">Bugs</h2>
 <h3 id="escaped_hits">Escaped Characters in Log</h3>
