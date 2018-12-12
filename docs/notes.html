@@ -44,10 +44,6 @@ table { table-layout: fixed;
 
 
 <h2 id="intro">Introduction</h2>
-<p><code>clf-to-sqlite</code> is a command line program to extract entries from <a href="http://httpd.apache.org/docs/current/logs.html#combined" target="_blank">Combined Log Format</a> web logs and load the parsed lines into an SQLite database.</p>
-
-<p>The program is written in <a href="https://wiki.gnome.org/Projects/Genie/" target="_blank">Genie</a> for performance. The program will typically extract, parse and load 300,000 log entries into an SQLite database in ~7 seconds on a 2.5GHz CPU. The program is single threaded.</p>
-
 <p>Two file names should be passed as parameters to the program. The first points to the web log to be processed. The second points to the SQLite database to store the web server hits in a staging table.</p>
 <p>A web server hit is stored using nine fields in the web log. This is the combined log format:</p>
 <ol>
