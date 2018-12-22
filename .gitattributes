@@ -1,1 +1,2 @@
 *.gs linguist-language=Genie
+tests/* linguist-vendored
